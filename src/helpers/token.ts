@@ -62,3 +62,10 @@ export const verifyJWT: RequestHandler = async (
     errorHandler(res, error);
   }
 };
+
+export const tokenFromQuery: RequestHandler = async (req, _res, next) => {
+  if (!req.headers.authorization && req.query.token) {
+    req.headers.authorization = `Bearer ${req.query.token}`;
+  }
+  next();
+};

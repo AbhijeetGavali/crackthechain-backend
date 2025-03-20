@@ -11,6 +11,9 @@ import { buildResponse } from "../common/utils";
 import { ValidationFailedError, errorHandler } from "../common/errors";
 import { getToken } from "../helpers/token";
 import { JWTRequest } from "../interfaces/express";
+import { emailTemplate } from "../common/emailTemplate";
+import EmailService from "../services/mail.service";
+import { FRONTEND_WEB_URL } from "../common/constants";
 
 dotenv.config();
 
@@ -57,7 +60,27 @@ class AuthController {
         3,
       );
 
+      await EmailService.sendEmail({
+        to: signUpData.email,
+        subject:
+          "SIGNUP: Your account is created on CrackTheChain Platform. Please verify your email.",
+        html: emailTemplate.signupEmail(jwtToken),
+      });
+
       res.status(200).send(buildResponse({ jwtToken }, "Signup successfully"));
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
+
+  verifyEmail: RequestHandler = async (req: JWTRequest, res) => {
+    try {
+      const { email } = req.jwt;
+      const result = await this._userService.verifyUserByEmail(email);
+      if (!result) {
+        throw new ValidationFailedError("User does not exist");
+      }
+      res.redirect(`${FRONTEND_WEB_URL}/`);
     } catch (error) {
       errorHandler(res, error);
     }
@@ -102,11 +125,41 @@ class AuthController {
     }
   };
 
-  sendRequestResetPassword: RequestHandler = async (req: JWTRequest, res) => {
+  sendRequestResetPassword: RequestHandler = async (req, res) => {
     try {
       const { email }: SendRequestResetPasswordDataScehema = req.body;
-
+      const result = await this._userService.getUserByEmail(email);
+      if (!result) {
+        throw new ValidationFailedError("User does not exist");
+      }
+      const resetToken = await getToken(
+        {
+          email: email,
+          uid: result._id,
+          claim: "resetPassword",
+        },
+        1,
+      );
+      await EmailService.sendEmail({
+        to: email,
+        subject: "RESET: you have requested to reset your password.",
+        html: emailTemplate.resetPassword(resetToken),
+      });
       res.status(200).send(buildResponse(null, "Password reset successful"));
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
+
+  updatePassword: RequestHandler = async (req: JWTRequest, res) => {
+    try {
+      const { password } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const result = await this._userService.updatePassword(
+        req.jwt.uid,
+        hashedPassword,
+      );
+      res.status(200).send(buildResponse(result, ""));
     } catch (error) {
       errorHandler(res, error);
     }

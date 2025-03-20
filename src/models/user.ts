@@ -9,6 +9,7 @@ export interface IUser extends Document {
   profilePhoto: string;
   authCode: string;
   loginType: string;
+  isVerified: boolean;
 }
 
 export const UserSchema = new Schema(
@@ -20,6 +21,7 @@ export const UserSchema = new Schema(
     profilePhoto: { type: String },
     authCode: { type: String },
     loginType: { type: String },
+    isVerified: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

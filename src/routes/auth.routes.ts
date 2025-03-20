@@ -1,11 +1,14 @@
 import { Router } from "express";
-import { bodySchemaValidator } from "../middlewares/schema.validator";
+import {
+  bodySchemaValidator,
+} from "../middlewares/schema.validator";
 import AuthController from "../controllers/auth.controller";
 import {
   SendRequestResetPasswordData,
   SignUpData,
   SignInData,
 } from "../schemas/auth";
+import { tokenFromQuery, verifyJWT } from "../helpers/token";
 
 const authRouter = Router({ mergeParams: true });
 
@@ -27,6 +30,13 @@ authRouter.post(
   "/request-reset-password",
   bodySchemaValidator(SendRequestResetPasswordData),
   authController.sendRequestResetPassword,
+);
+
+authRouter.get(
+  "/verify-email",
+  tokenFromQuery,
+  verifyJWT,
+  authController.verifyEmail,
 );
 
 export default authRouter;

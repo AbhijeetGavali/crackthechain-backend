@@ -31,6 +31,6 @@ function buildProdLogger() {
 }
 
 const logger =
-  process.env.NODE_ENV === "development" ? buildDevLogger() : buildProdLogger();
+  process.env.NODE_ENV === "DEVELOPMENT" ? buildDevLogger() : buildProdLogger();
 
 export default logger;
