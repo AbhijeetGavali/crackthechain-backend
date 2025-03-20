@@ -73,6 +73,9 @@ export const emailTemplate = {
         <p>Greetings,</p>
         <p>You have requested a password reset for your CrackTheChain account. Click the button below to reset your password.</p>
         <p><a href="${FRONTEND_WEB_URL}/update-password?token=${token}" class="button">Reset Password</a></p>
+        OR
+        copy paste the link below in your browser
+        <p>${FRONTEND_WEB_URL}/update-password?token=${token}</p>
       </div>
       <div class="footer">
         <p>&copy; 2024 CrackTheChain. All rights reserved.</p>
@@ -88,6 +91,9 @@ export const emailTemplate = {
         <p>Greetings,</p>
         <p>Your CrackTheChain account has been created successfully. Click the button below to verify your email.</p>
         <p><a href="${BACKEND_URL}/api/v1/users/auth/verify-email?token=${token}" class="button">Verify Email</a></p>
+        OR
+        copy paste the link below in your browser
+        <p>${BACKEND_URL}/api/v1/users/auth/verify-email?token=${token}</p>
       </div>
       <div class="footer">
         <p>&copy; 2024 CrackTheChain. All rights reserved.</p>
