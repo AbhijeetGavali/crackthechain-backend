@@ -35,6 +35,8 @@ authRouter.post(
 
 authRouter.post(
   "/update-password",
+  tokenFromQuery,
+  verifyJWT,
   bodySchemaValidator(updatePasswordData),
   authController.updatePassword,
 );
