@@ -50,8 +50,8 @@ class UserService {
    * @returns user document.
    */
   updatePassword = async (uid: UserType["uid"], password: string) => {
-    const user = await User.findByIdAndUpdate(uid, { password });
-    delete user?.password;
+    let user = await User.findByIdAndUpdate(uid, { password });
+    if (user) user.password = "";
     return user;
   };
 
