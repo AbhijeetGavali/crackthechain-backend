@@ -7,6 +7,7 @@ import {
   SendRequestResetPasswordData,
   SignUpData,
   SignInData,
+  updatePasswordData,
 } from "../schemas/auth";
 import { tokenFromQuery, verifyJWT } from "../helpers/token";
 
@@ -30,6 +31,12 @@ authRouter.post(
   "/request-reset-password",
   bodySchemaValidator(SendRequestResetPasswordData),
   authController.sendRequestResetPassword,
+);
+
+authRouter.post(
+  "/update-password",
+  bodySchemaValidator(updatePasswordData),
+  authController.updatePassword,
 );
 
 authRouter.get(

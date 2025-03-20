@@ -38,8 +38,16 @@ export const SendRequestResetPasswordData = z.object({
   email: z.string().email(),
 });
 
+export const updatePasswordData = z.object({
+  password: z.string(),
+});
+
 export type SignInDataScehema = z.infer<typeof SignInData>;
 export type SignUpDataScehema = z.infer<typeof SignUpData>;
 export type SendRequestResetPasswordDataScehema = z.infer<
   typeof SendRequestResetPasswordData
+>;
+
+export type updatePasswordDataScehema = z.infer<
+  typeof updatePasswordData
 >;
