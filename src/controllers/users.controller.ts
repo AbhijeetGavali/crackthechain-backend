@@ -16,6 +16,8 @@ class UserController {
       if (!user) {
         throw new ValidationFailedError("User does not exist");
       }
+      
+      user.password = undefined;
 
       res
         .status(200)
