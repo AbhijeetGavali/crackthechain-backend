@@ -49,6 +49,26 @@ class ProjectController {
     }
   };
 
+  // GET /api/projects/published/dropdown
+  getPublishedProjectsForDropdown = async (req: Request, res: Response) => {
+    try {
+      const isProject = req.query.type === "program" ? false : true;
+
+      const projectsWithReportCount =
+        await this._projectService.getPublishedProjectsForDropdown(isProject);
+      res
+        .status(200)
+        .send(
+          buildResponse(
+            { projects: projectsWithReportCount },
+            "Published projects fetched successfully",
+          ),
+        );
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
+
   // GET /api/projects/:id
   getProjectDetails = async (req: Request, res: Response) => {
     try {

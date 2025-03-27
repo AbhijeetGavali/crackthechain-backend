@@ -2,14 +2,15 @@ import { Request, Response } from "express";
 import { buildResponse } from "../common/utils";
 import { errorHandler } from "../common/errors";
 import ReportService from "../services/report.service";
+import { JWTRequest } from "../interfaces/express";
 
 class ReportController {
   private _reportService = new ReportService();
 
   // POST /api/reports
-  createReport = async (req: Request, res: Response) => {
+  createReport = async (req: JWTRequest, res: Response) => {
     try {
-      const data = req.body;
+      const data = { ...req.body, userId: req.jwt.uid };
       const savedReport = await this._reportService.createReport(data);
       res
         .status(201)
@@ -128,9 +129,9 @@ class ReportController {
   };
 
   // GET /api/reports/user/:userId?page=&limit=
-  getReportsByUser = async (req: Request, res: Response) => {
+  getReportsByUser = async (req: JWTRequest, res: Response) => {
     try {
-      const { userId } = req.params;
+      const userId = req.jwt.uid;
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
       const reports = await this._reportService.getReportsByUser(

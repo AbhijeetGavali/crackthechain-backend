@@ -123,6 +123,19 @@ class SectionController {
       errorHandler(res, error);
     }
   };
+
+  // GET /api/projects/:projectId/assest?page=&limit=
+  getAssetsOfProject = async (req: Request, res: Response) => {
+    try {
+      const { projectId } = req.params;
+      const sections = await this._sectionService.getAssetsOfProject(projectId);
+      res
+        .status(200)
+        .send(buildResponse(sections, "Sections fetched successfully"));
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
 }
 
 export default SectionController;

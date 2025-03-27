@@ -64,4 +64,13 @@ sectionRouter.get(
   sectionController.getSectionsByProject,
 );
 
+/**
+ * GET /api/projects/:projectId/assets?page=&limit=
+ * Get list of assets for a project/program with pagination.
+ */
+sectionRouter.get(
+  "/:projectId/assets",
+  sectionController.getAssetsOfProject,
+);
+
 export default sectionRouter;

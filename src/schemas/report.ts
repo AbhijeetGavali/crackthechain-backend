@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const createReportData = z.object({
-  userId: z.string().min(1, "User ID is required"),
   projectId: z.string().min(1, "Project ID is required"),
   selectedAsset: z.string().min(1, "Selected asset is required"),
   severity: z.enum(["low", "medium", "high", "critical"]),

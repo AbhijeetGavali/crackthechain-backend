@@ -2,6 +2,7 @@ import ProjectReport from "../models/projectReport";
 import Project from "../models/project";
 import User from "../models/user";
 import { CreateReportSchema, UpdateReportSchema } from "../schemas/report";
+import { Types } from "mongoose";
 
 class ReportService {
   // Create a new project report.
@@ -87,14 +88,31 @@ class ReportService {
   };
 
   // Get all reports submitted by a specific user with pagination.
-  getReportsByUser = async (userId: string, page: number, limit: number) => {
+  getReportsByUser = async (
+    userId: Types.ObjectId,
+    page: number,
+    limit: number,
+  ) => {
     const skip = (page - 1) * limit;
     const reports = await ProjectReport.find({ userId })
       .skip(skip)
       .limit(limit)
+      .populate({
+        path: "projectId",
+        select: "projectName",
+      })
       .exec();
     const user = await User.findById(userId).exec();
-    return { user, reports };
+    const totalCount = await ProjectReport.countDocuments({ userId });
+    return {
+      user,
+      reports: reports,
+      pagination: {
+        totalCount,
+        currentPage: page,
+        currentSize: limit,
+      },
+    };
   };
 
   // Get detailed information for a specific report.

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { bodySchemaValidator } from "../middlewares/schema.validator";
 import ReportController from "../controllers/report.controller";
 import { createReportData, updateReportData } from "../schemas/report";
+import { verifyJWT } from "../helpers/token";
 
 const reportRouter = Router({ mergeParams: true });
 const reportController = new ReportController();
@@ -12,6 +13,7 @@ const reportController = new ReportController();
  */
 reportRouter.post(
   "/",
+  verifyJWT,
   bodySchemaValidator(createReportData),
   reportController.createReport,
 );
@@ -65,7 +67,7 @@ reportRouter.get(
  * Get list of all project reports submitted by a user.
  * Response should include user details and the associated project details.
  */
-reportRouter.get("/user/:userId", reportController.getReportsByUser);
+reportRouter.get("/user", verifyJWT, reportController.getReportsByUser);
 
 /**
  * GET /api/reports/:id

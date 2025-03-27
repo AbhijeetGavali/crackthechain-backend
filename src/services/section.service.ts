@@ -43,7 +43,7 @@ class SectionService {
   deleteSection = async (sectionId: string) => {
     const section = await ProjectSection.findById(sectionId);
     if (!section) return null;
-    
+
     return await section.softDelete();
   };
 
@@ -101,6 +101,12 @@ class SectionService {
         currentPage: page,
         currentSize: limit,
       },
+    };
+  };
+
+  getAssetsOfProject = async (projectId: string) => {
+    return {
+      assetList: await ProjectSection.find({ projectId, isAsset: true }).exec(),
     };
   };
 }

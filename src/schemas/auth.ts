@@ -34,6 +34,13 @@ export const SignUpData = z.object({
     ),
 });
 
+export const updateUserData = z.object({
+  companyName: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  about: z.string().optional(),
+});
+
 export const SendRequestResetPasswordData = z.object({
   email: z.string().email(),
 });
@@ -48,6 +55,6 @@ export type SendRequestResetPasswordDataScehema = z.infer<
   typeof SendRequestResetPasswordData
 >;
 
-export type updatePasswordDataScehema = z.infer<
-  typeof updatePasswordData
->;
+export type updatePasswordDataScehema = z.infer<typeof updatePasswordData>;
+
+export type UpdateUserDataScehema = z.infer<typeof updateUserData>;

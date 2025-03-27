@@ -10,6 +10,10 @@ export interface IUser extends Document {
   authCode: string;
   loginType: string;
   isVerified: boolean;
+  about: string;
+  socialLink: string[];
+  softDelete(): Promise<void>;
+  restoreUser(): Promise<void>;
 }
 
 export const UserSchema = new Schema(
@@ -20,11 +24,28 @@ export const UserSchema = new Schema(
     password: { type: String, required: true },
     profilePhoto: { type: String },
     authCode: { type: String },
-    loginType: { type: String },
+    loginType: { type: String, enum: ["researcher", "company", "admin"] },
+    about: { type: String, default: [] },
+    socialLink: { type: Array<String>, default: [] },
     isVerified: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
+
+// Add a method for soft delete
+UserSchema.methods.softDelete = async function () {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  return await this.save();
+};
+
+// Add a method for restore User
+UserSchema.methods.restoreUser = async function () {
+  this.isDeleted = false;
+  this.isVerified = false;
+  this.deletedAt = new Date();
+  return await this.save();
+};
 
 const User = model<IUser>("User", UserSchema);
 

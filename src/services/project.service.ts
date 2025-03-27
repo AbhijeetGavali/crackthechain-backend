@@ -22,6 +22,7 @@ class ProjectService {
           as: "reports",
           pipeline: [
             { $match: { isDeleted: false } },
+            { $match: { isDraft: false } },
             { $count: "reportCount" },
           ],
         },
@@ -71,12 +72,27 @@ class ProjectService {
       projects.map(async (project) => {
         const reportCount = await ProjectReport.countDocuments({
           projectId: project._id,
+          isDraft: false,
         }).exec();
         return { ...project.toObject(), reportCount };
       }),
     );
 
     return projectsWithReportCount;
+  };
+
+  // Get published projects/programs with a count of submitted reports.
+  getPublishedProjectsForDropdown = async (isProject: boolean) => {
+    const projects = await Project.find(
+      {
+        isProject,
+        isPublished: true,
+        isDeleted: false,
+      },
+      "_id projectName",
+    ).exec();
+
+    return projects;
   };
 
   // Get a single project by its id including its sections.

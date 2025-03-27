@@ -19,6 +19,12 @@ projectRouter.get("/", projectController.getProjects);
 projectRouter.get("/published", projectController.getPublishedProjects);
 
 /**
+ * GET /api/projects/published/dropdown
+ * Get published projects/programs along with a count of submitted reports.
+ */
+projectRouter.get("/published/dropdown", projectController.getPublishedProjectsForDropdown);
+
+/**
  * GET /api/projects/:id
  * Get project/program details including its sections.
  */
