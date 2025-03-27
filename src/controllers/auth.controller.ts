@@ -96,7 +96,10 @@ class AuthController {
         throw new ValidationFailedError("User does not exist");
       }
 
-      if (userDocument.loginType !== loginType) {
+      if (
+        userDocument.loginType != "admin" &&
+        userDocument.loginType !== loginType
+      ) {
         throw new ValidationFailedError("Invalid login type");
       }
 
