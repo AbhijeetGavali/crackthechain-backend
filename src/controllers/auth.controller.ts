@@ -96,6 +96,10 @@ class AuthController {
         throw new ValidationFailedError("User does not exist");
       }
 
+      if (userDocument.isDeleted) {
+        throw new ValidationFailedError("User restricted by ADMIN");
+      }
+
       if (
         userDocument.loginType != "admin" &&
         userDocument.loginType !== loginType

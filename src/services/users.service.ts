@@ -101,7 +101,7 @@ class UserService {
           },
         },
       },
-      { $project: { password: 0 } },
+      { $project: { password: 0, reports: 0 } },
       { $skip: skip },
       { $limit: limit },
     ]);

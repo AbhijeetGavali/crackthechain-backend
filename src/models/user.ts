@@ -12,6 +12,8 @@ export interface IUser extends Document {
   isVerified: boolean;
   about: string;
   socialLink: string[];
+  isDeleted: boolean;
+  deletedAt?: Date;
   softDelete(): Promise<void>;
   restoreUser(): Promise<void>;
 }
@@ -28,6 +30,8 @@ export const UserSchema = new Schema(
     about: { type: String, default: [] },
     socialLink: { type: Array<String>, default: [] },
     isVerified: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date },
   },
   { timestamps: true },
 );
