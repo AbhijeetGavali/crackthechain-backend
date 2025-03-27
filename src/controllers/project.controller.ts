@@ -34,15 +34,15 @@ class ProjectController {
       const page = parseInt(req.query.page as string, 10) || 1;
       const limit = parseInt(req.query.limit as string, 10) || 10;
 
-      const projectsWithReportCount =
-        await this._projectService.getPublishedProjects(isProject, page, limit);
+      const projects = await this._projectService.getPublishedProjects(
+        isProject,
+        page,
+        limit,
+      );
       res
         .status(200)
         .send(
-          buildResponse(
-            { projects: projectsWithReportCount },
-            "Published projects fetched successfully",
-          ),
+          buildResponse(projects, "Published projects fetched successfully"),
         );
     } catch (error) {
       errorHandler(res, error);
@@ -73,8 +73,9 @@ class ProjectController {
   getProjectDetails = async (req: Request, res: Response) => {
     try {
       const projectId = req.params.id;
-      const project = await this._projectService.getProjectById(projectId);
-      if (!project) {
+      const projectDetails =
+        await this._projectService.getProjectById(projectId);
+      if (!projectDetails) {
         res.status(404).send(buildResponse(null, "Project not found"));
         return;
       }
@@ -83,7 +84,7 @@ class ProjectController {
       res
         .status(200)
         .send(
-          buildResponse({ project }, "Project details fetched successfully"),
+          buildResponse(projectDetails, "Project details fetched successfully"),
         );
     } catch (error) {
       errorHandler(res, error);

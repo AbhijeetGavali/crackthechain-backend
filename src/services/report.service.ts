@@ -101,6 +101,7 @@ class ReportService {
         path: "projectId",
         select: "projectName",
       })
+      .sort({ createdAt: -1 })
       .exec();
     const user = await User.findById(userId).exec();
     const totalCount = await ProjectReport.countDocuments({ userId });

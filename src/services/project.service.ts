@@ -67,18 +67,20 @@ class ProjectService {
       .limit(limit)
       .exec();
 
-    // For each project, count the number of submitted reports.
-    const projectsWithReportCount = await Promise.all(
-      projects.map(async (project) => {
-        const reportCount = await ProjectReport.countDocuments({
-          projectId: project._id,
-          isDraft: false,
-        }).exec();
-        return { ...project.toObject(), reportCount };
-      }),
-    );
+    const totalCount = await Project.countDocuments({
+      isProject,
+      isPublished: true,
+      isDeleted: false,
+    });
 
-    return projectsWithReportCount;
+    return {
+      projects,
+      pagination: {
+        totalCount,
+        currentPage: page,
+        currentSize: limit,
+      },
+    };
   };
 
   // Get published projects/programs with a count of submitted reports.
@@ -105,7 +107,7 @@ class ProjectService {
       .lean()
       .exec();
 
-    return { ...project, sections };
+    return { project, sections };
   };
 
   // Create a new project/program.
