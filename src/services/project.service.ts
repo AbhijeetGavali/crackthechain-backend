@@ -32,7 +32,7 @@ class ProjectService {
           from: "users",
           localField: "companyId",
           foreignField: "_id",
-          as: "user",
+          as: "companyId",
           pipeline: [
             { $match: { isDeleted: false } },
             {
@@ -51,8 +51,8 @@ class ProjectService {
           reportCount: {
             $ifNull: [{ $arrayElemAt: ["$reports.reportCount", 0] }, 0],
           },
-          user: {
-            $arrayElemAt: ["$user", 0],
+          companyId: {
+            $arrayElemAt: ["$companyId", 0],
           },
         },
       },
@@ -89,7 +89,7 @@ class ProjectService {
       .skip(skip)
       .limit(limit)
       .populate({
-        path: "userId",
+        path: "companyId",
         select: "companyName email profilePhoto about",
       })
       .sort({ createdAt: -1 })
@@ -129,16 +129,18 @@ class ProjectService {
 
   // Get a single project by its id including its sections.
   getProjectById = async (projectId: string) => {
-    const project = await Project.findById(projectId).lean().exec();
+    const project = await Project.findById(projectId)
+      .populate({
+        path: "companyId",
+        select: "companyName email profilePhoto about",
+      })
+      .lean()
+      .exec();
     if (!project) return null;
 
     const sections = await ProjectSection.find({ projectId: project._id })
       .sort({ rank: 1 })
       .lean()
-      .populate({
-        path: "userId",
-        select: "companyName email profilePhoto about",
-      })
       .exec();
 
     return { project, sections };

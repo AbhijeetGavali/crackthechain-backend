@@ -29,7 +29,7 @@ export const UserSchema = new Schema(
     profilePhoto: { type: String },
     authCode: { type: String },
     loginType: { type: String, enum: ["researcher", "company", "admin"] },
-    about: { type: String, default: [] },
+    about: { type: Array<String>, default: [] },
     socialLink: { type: Array<String>, default: [] },
     isVerified: { type: Boolean, default: false },
     isDeleted: { type: Boolean, default: false },
