@@ -43,6 +43,27 @@ class UserController {
     }
   };
 
+  // GET /api/users?type=user&page=&limit=
+  getUserDashboardStats = async (req: Request, res: Response) => {
+    try {
+      // isUser flag: if type is , set isUser to false.
+      const loginType = (req.query.type as string) || "company";
+
+      let results;
+      if (loginType == "admin")
+        results = await this._usersService.getAdminDashboardStats();
+      if (loginType == "company")
+        results = await this._usersService.getAdminDashboardStats();
+      if (loginType == "resear")
+        results = await this._usersService.getAdminDashboardStats();
+      res
+        .status(200)
+        .send(buildResponse(results, "Users fetched successfully"));
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
+
   // GET /api/users/published?type=user|&page=&limit=
   getTopUsers = async (req: Request, res: Response) => {
     try {

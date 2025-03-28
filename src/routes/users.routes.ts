@@ -17,6 +17,12 @@ userRouter.get("/profile", verifyJWT, userController.getUserProfile);
 userRouter.get("/", userController.getUsers);
 
 /**
+ * GET /api/users?page=&limit=
+ * Get all users.
+ */
+userRouter.get("/stats", userController.getUserDashboardStats);
+
+/**
  * GET /api/users/top
  * Get user details including its sections.
  */

@@ -4,6 +4,7 @@ import { SignUpDataScehema, UpdateUserDataScehema } from "../schemas/auth";
 import AuthCode from "../models/AuthCode";
 import { User as UserType } from "../interfaces/express";
 import ProjectReport from "../models/projectReport";
+import Project from "../models/project";
 
 class UserService {
   /**
@@ -116,6 +117,108 @@ class UserService {
         currentPage: page,
         currentSize: limit,
       },
+    };
+  };
+
+  // Get users/programs based on type (isUser flag) with pagination.
+  getAdminDashboardStats = async () => {
+    const projectStats = await Project.aggregate([
+      {
+        $group: {
+          _id: {
+            isProject: "$isProject",
+            isPublish: "$isPublished",
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $addFields: {
+          type: {
+            $cond: [{ $eq: ["$_id.isProject", true] }, "Project", "Program"],
+          },
+          status: {
+            $cond: [
+              { $eq: ["$_id.isPublish", true] },
+              "Published",
+              "Unpublished",
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          type: 1,
+          status: 1,
+          count: 1,
+        },
+      },
+    ]);
+
+    const userStats = await User.aggregate([
+      {
+        $match: {
+          loginType: { $ne: "admin" },
+        },
+      },
+      {
+        $group: {
+          _id: "$loginType",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const reportStats = await ProjectReport.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
+        $facet: {
+          totalPublishedReports: [
+            {
+              $match: { isDraft: false },
+            },
+            {
+              $count: "count",
+            },
+          ],
+          settledReports: [
+            {
+              $match: { status: "accepted" },
+            },
+            {
+              $count: "count",
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          totalPublishedReports: {
+            $arrayElemAt: ["$totalPublishedReports.count", 0],
+          },
+          settledReports: { $arrayElemAt: ["$settledReports.count", 0] },
+        },
+      },
+    ]);
+
+    return {
+      projectStats: projectStats.reduce(
+        (prv, crt) => ({
+          ...prv,
+          [crt.type]: { ...prv[crt.type], [crt.status]: crt.count },
+        }),
+        {},
+      ),
+      userStats: userStats.reduce(
+        (prv, crt) => ({ ...prv, [crt._id]: crt.count }),
+        {},
+      ),
+      reportStats: reportStats[0],
     };
   };
 
