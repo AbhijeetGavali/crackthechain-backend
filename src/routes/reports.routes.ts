@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { bodySchemaValidator } from "../middlewares/schema.validator";
 import ReportController from "../controllers/report.controller";
-import { createReportData, updateReportData } from "../schemas/report";
+import { createReportData, updateReportByCompanyData, updateReportData } from "../schemas/report";
 import { verifyJWT } from "../helpers/token";
 
 const reportRouter = Router({ mergeParams: true });
@@ -22,9 +22,19 @@ reportRouter.post(
  * PUT /api/reports/:id
  * Update an existing project report.
  */
-reportRouter.put(
+reportRouter.patch(
   "/:id",
   bodySchemaValidator(updateReportData),
+  reportController.updateReport,
+);
+
+/**
+ * PUT /api/reports/c/:id
+ * Update an existing project report.
+ */
+reportRouter.patch(
+  "/c/:id",
+  bodySchemaValidator(updateReportByCompanyData),
   reportController.updateReport,
 );
 

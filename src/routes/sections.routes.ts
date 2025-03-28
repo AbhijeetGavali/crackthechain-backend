@@ -26,7 +26,7 @@ sectionRouter.post(
  * PUT /api/sections/:id
  * Update a section. If marking as asset, unmark other sections for the same project.
  */
-sectionRouter.put(
+sectionRouter.patch(
   "/:id",
   bodySchemaValidator(updateSectionData),
   sectionController.updateSection,

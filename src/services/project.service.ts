@@ -28,15 +28,38 @@ class ProjectService {
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "companyId",
+          foreignField: "_id",
+          as: "user",
+          pipeline: [
+            { $match: { isDeleted: false } },
+            {
+              $project: {
+                companyName: 1,
+                email: 1,
+                profilePhoto: 1,
+                about: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
         $addFields: {
           reportCount: {
             $ifNull: [{ $arrayElemAt: ["$reports.reportCount", 0] }, 0],
+          },
+          user: {
+            $arrayElemAt: ["$user", 0],
           },
         },
       },
       { $project: { reports: 0 } },
       { $skip: skip },
       { $limit: limit },
+      { $sort: { createdAt: -1 } },
     ]);
 
     const totalCount = await Project.countDocuments({ isProject });
@@ -65,6 +88,11 @@ class ProjectService {
     })
       .skip(skip)
       .limit(limit)
+      .populate({
+        path: "userId",
+        select: "companyName email profilePhoto about",
+      })
+      .sort({ createdAt: -1 })
       .exec();
 
     const totalCount = await Project.countDocuments({
@@ -92,7 +120,9 @@ class ProjectService {
         isDeleted: false,
       },
       "_id projectName",
-    ).exec();
+    )
+      .sort({ projectName: -1 })
+      .exec();
 
     return projects;
   };
@@ -105,6 +135,10 @@ class ProjectService {
     const sections = await ProjectSection.find({ projectId: project._id })
       .sort({ rank: 1 })
       .lean()
+      .populate({
+        path: "userId",
+        select: "companyName email profilePhoto about",
+      })
       .exec();
 
     return { project, sections };

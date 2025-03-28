@@ -1,7 +1,11 @@
 import ProjectReport from "../models/projectReport";
 import Project from "../models/project";
 import User from "../models/user";
-import { CreateReportSchema, UpdateReportSchema } from "../schemas/report";
+import {
+  CreateReportSchema,
+  UpdateReportByCompanySchema,
+  UpdateReportSchema,
+} from "../schemas/report";
 import { Types } from "mongoose";
 
 class ReportService {
@@ -12,7 +16,10 @@ class ReportService {
   };
 
   // Update an existing project report.
-  updateReport = async (reportId: string, data: UpdateReportSchema) => {
+  updateReport = async (
+    reportId: string,
+    data: UpdateReportSchema | UpdateReportByCompanySchema,
+  ) => {
     return await ProjectReport.findByIdAndUpdate(reportId, data, {
       new: true,
     }).exec();
@@ -67,6 +74,11 @@ class ReportService {
     })
       .skip(skip)
       .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "userId",
+        select: "firstName lastName",
+      })
       .exec();
 
     const project = await Project.findById(projectId).exec();

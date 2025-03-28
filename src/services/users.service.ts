@@ -83,7 +83,7 @@ class UserService {
     const users = await User.aggregate([
       {
         $lookup: {
-          from: "projectreport",
+          from: "projectreports",
           localField: "_id",
           foreignField: "userId",
           as: "reports",
@@ -104,6 +104,7 @@ class UserService {
       { $project: { password: 0, reports: 0 } },
       { $skip: skip },
       { $limit: limit },
+      { $sort: { createdAt: -1 } },
     ]);
 
     const totalCount = await User.countDocuments();
@@ -140,6 +141,20 @@ class UserService {
     );
 
     return usersWithReportCount;
+  };
+
+  // Get dropdown to show users in option
+  getUsersDropdown = async (loginType: string) => {
+    const users = await User.find(
+      {
+        loginType,
+      },
+      "_id companyName email firstName lastName",
+    )
+      .sort({ createdAt: -1 })
+      .exec();
+
+    return users;
   };
 
   // Get a single user by its id including its sections.

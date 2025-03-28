@@ -16,5 +16,13 @@ export const updateReportData = z.object({
   reportDescription: z.string().optional(),
 });
 
+export const updateReportByCompanyData = z.object({
+  status: z.string().optional(),
+  points: z.number().optional(),
+});
+
 export type CreateReportSchema = z.infer<typeof createReportData>;
 export type UpdateReportSchema = z.infer<typeof updateReportData>;
+export type UpdateReportByCompanySchema = z.infer<
+  typeof updateReportByCompanyData
+>;

@@ -3,6 +3,7 @@ import { Document, Schema, Types, model } from "mongoose";
 export interface IProject extends Document {
   _id: Types.ObjectId;
   projectName: string;
+  companyId: Types.ObjectId;
   projectDescription: string;
   minPrice: number;
   maxPrice: number;
@@ -23,6 +24,7 @@ export interface IProject extends Document {
 export const ProjectSchema = new Schema(
   {
     projectName: { type: String, required: true },
+    companyId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     projectDescription: { type: String, required: true },
     minPrice: { type: Number, required: true },
     maxPrice: { type: Number, required: true },

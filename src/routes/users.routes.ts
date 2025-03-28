@@ -23,6 +23,12 @@ userRouter.get("/", userController.getUsers);
 userRouter.get("/top", userController.getTopUsers);
 
 /**
+ * GET /api/users/data/dropdown
+ * Get user details including its sections.
+ */
+userRouter.get("/dropdown", userController.getUsersDropdown);
+
+/**
  * GET /api/users/:id
  * Get user details including its sections.
  */

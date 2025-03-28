@@ -66,6 +66,26 @@ class UserController {
     }
   };
 
+  // GET /api/users/data/dropdown?type=user
+  getUsersDropdown = async (req: Request, res: Response) => {
+    try {
+      const loginType = (req.query.type as string) || "company";
+
+      const usersWithReportCount =
+        await this._usersService.getUsersDropdown(loginType);
+      res
+        .status(200)
+        .send(
+          buildResponse(
+            { company: usersWithReportCount },
+            "Top users fetched successfully",
+          ),
+        );
+    } catch (error) {
+      errorHandler(res, error);
+    }
+  };
+
   // GET /api/users/:id
   getUserDetails = async (req: Request, res: Response) => {
     try {

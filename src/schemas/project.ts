@@ -3,6 +3,7 @@ import { dateParser } from "./helper";
 
 export const createProjectData = z.object({
   projectName: z.string().min(1, "Project name is required"),
+  companyId: z.string(),
   projectDescription: z.string().min(1, "Project description is required"),
   minPrice: z.number(),
   maxPrice: z.number(),
