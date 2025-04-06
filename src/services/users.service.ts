@@ -243,7 +243,10 @@ class UserService {
       }),
     );
 
-    return usersWithReportCount;
+    return usersWithReportCount.map((user) => ({
+      name: user.firstName + " " + user.lastName,
+      _id: user._id,
+    }));
   };
 
   // Get dropdown to show users in option

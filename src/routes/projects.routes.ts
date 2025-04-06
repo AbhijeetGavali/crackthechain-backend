@@ -2,6 +2,7 @@ import { Router } from "express";
 import { bodySchemaValidator } from "../middlewares/schema.validator";
 import ProjectController from "../controllers/project.controller";
 import { createProjectData, updateProjectData } from "../schemas/project";
+import { verifyJWT } from "../helpers/token";
 
 const projectRouter = Router({ mergeParams: true });
 const projectController = new ProjectController();
@@ -36,6 +37,7 @@ projectRouter.get("/:id", projectController.getProjectDetails);
  */
 projectRouter.post(
   "/",
+  verifyJWT,
   bodySchemaValidator(createProjectData),
   projectController.createProject,
 );

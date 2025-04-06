@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { buildResponse } from "../common/utils";
 import { errorHandler } from "../common/errors";
 import ProjectService from "../services/project.service";
+import { JWTRequest } from "../interfaces/express";
 
 class ProjectController {
   private _projectService = new ProjectService();
@@ -92,9 +93,10 @@ class ProjectController {
   };
 
   // POST /api/projects
-  createProject = async (req: Request, res: Response) => {
+  createProject = async (req: JWTRequest, res: Response) => {
     try {
       const data = req.body;
+      if (req.jwt.claim == "company") data["companyId"] = req.jwt.uid;
       const newProject = await this._projectService.createProject(data);
       res
         .status(201)
