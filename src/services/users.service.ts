@@ -225,27 +225,122 @@ class UserService {
   // Get published users with a count of submitted reports.
   getTopUsers = async (page: number, limit: number) => {
     const skip = (page - 1) * limit;
-    const users = await User.find({
-      isDeleted: false,
-    })
-      .skip(skip)
-      .limit(limit)
-      .exec();
 
-    // For each user, count the number of submitted reports.
-    const usersWithReportCount = await Promise.all(
-      users.map(async (user) => {
-        const reportCount = await ProjectReport.countDocuments({
-          userId: user._id,
-          isDraft: false,
-        }).exec();
-        return { ...user.toObject(), reportCount };
-      }),
-    );
+    const users = await User.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          loginType: "researcher",
+        },
+      },
+      {
+        $lookup: {
+          from: "projectreports",
+          localField: "_id",
+          foreignField: "userId",
+          as: "reports",
+        },
+      },
+      {
+        $addFields: {
+          reportsSubmittedCount: {
+            $size: {
+              $filter: {
+                input: "$reports",
+                as: "report",
+                cond: {
+                  $and: [
+                    { $eq: ["$$report.isDraft", false] },
+                    { $eq: ["$$report.isDeleted", false] },
+                  ],
+                },
+              },
+            },
+          },
+          bountiesEarned: {
+            $size: {
+              $filter: {
+                input: "$reports",
+                as: "report",
+                cond: {
+                  $and: [
+                    { $eq: ["$$report.isAccepted", true] },
+                    { $eq: ["$$report.isDeleted", false] },
+                  ],
+                },
+              },
+            },
+          },
+          projectsContributed: {
+            $size: {
+              $setUnion: {
+                $map: {
+                  input: {
+                    $filter: {
+                      input: "$reports",
+                      as: "report",
+                      cond: {
+                        $and: [
+                          { $eq: ["$$report.isAccepted", true] },
+                          { $eq: ["$$report.isDeleted", false] },
+                        ],
+                      },
+                    },
+                  },
+                  as: "acceptedReport",
+                  in: "$$acceptedReport.projectId",
+                },
+              },
+            },
+          },
+          points: {
+            $sum: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: "$reports",
+                    as: "report",
+                    cond: {
+                      $and: [
+                        { $eq: ["$$report.isAccepted", true] },
+                        { $eq: ["$$report.isDeleted", false] },
+                      ],
+                    },
+                  },
+                },
+                as: "acceptedReport",
+                in: "$$acceptedReport.points",
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          firstName: 1,
+          lastName: 1,
+          profilePhoto: 1,
+          about: 1,
+          bountiesEarned: 1,
+          reportsSubmittedCount: 1,
+          projectsContributed: 1,
+          points: 1,
+        },
+      },
+      { $sort: { bountiesEarned: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
 
-    return usersWithReportCount.map((user) => ({
-      name: user.firstName + " " + user.lastName,
+    return users.map((user) => ({
       _id: user._id,
+      name: `${user.firstName} ${user.lastName}`,
+      profilePhoto: user.profilePhoto,
+      about: user.about,
+      bountiesEarned: user.bountiesEarned || 0,
+      reportsSubmittedCount: user.reportsSubmittedCount || 0,
+      projectsContributed: user.projectsContributed || 0,
+      points: user.points || 0,
     }));
   };
 
